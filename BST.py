@@ -32,7 +32,7 @@ class BST(Node):
                 BST  : the tree
                 None : if the list is empty
         """
-        if len(tab) == 0:
+        if not tab:
             return None
 
         tree = BST.plant(None, tab[0])
@@ -64,7 +64,55 @@ class BST(Node):
             else:
                 self.right.plant(value)
 
+    def size(self):
+        """ Returns the size of the tree
+            
+            Returns:
+                int : the size of the tree
+        """
+        if self == None:
+            return 0
+        return 1 + BST.size(self.left) + BST.size(self.right)
+    
+    def height(self):
+        """ Returns the height of the tree
+            
+            Returns:
+                int : the height of the tree
+        """
+        if self == None:
+            return -1
+        return 1 + max(
+            BST.height(self.left),
+            BST.height(self.right),
+        )
+    
+    def search(self, value):
+        """ Search a value in the tree
+
+            Parameters:
+                value(any) : the value to search
+            
+            Returns:
+                BST   : the node containing the value
+                False : if the value is not in the tree
+        """
+        if self is None:
+            return False
+
+        if (self.value == value):
+            return self
+		
+        if (self.value < value):
+            return BST.search(self.right,value)
+        else:
+            return BST.search(self.left,value)
+    
 if __name__ == "__main__":
     tab = [21,8,9,3,15,19,20,7,3,2,1,5,6,4,13,14,12,17,16,18]
-    bst = BST.create_bst(tab)
-    print(bst)
+    tree = BST.create_bst(tab)
+
+    print("Tree: ", tree)
+    print("Size: ", BST.size(tree))
+    print("Height: ", BST.height(tree))
+    print("Search 5: ", BST.search(tree, 5))
