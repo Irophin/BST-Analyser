@@ -118,9 +118,94 @@ class BST(Node):
             return BST.search(self.left,value)
     
 
+    def maximum_node(self):
+        """ Get the node having the maximum value of the tree
+
+            Returns:
+                BST   : the node containing the maximum value
+                False : if the value is not in the tree
+        """
+        if self is None:
+            return None
+        elif self.right is None:
+            return self
+        self.right.maximum_node()
+        
+
+    def minimum_node(self):
+        """Get the node having the minimum value of the tree
+
+            Returns:
+                BST   : the node containing the minimum value
+                False : if the value is not in the tree
+        """
+        if self is None:
+            return None
+        elif self.left is None:
+            return self
+        self.left.minimum_node()
 
 
-    def inorder(self):
+    def delete_node(self, key):
+        """ Delete the node having the key as value while keeping the structure of a BST
+
+            Parameters:
+                key(any) : the value to delete
+
+            Returns:
+                BST  : If the node was successfully deleted
+                None : If the node to delete doesn't exist in the tree, or if the tree has only the value to delete
+
+        """
+        # If the tree is empty
+        if self is None:
+            return None
+        
+        # We traverse the tree using an iterator
+        current = self
+        parent  = None
+
+        while current:
+            if key < current.value:
+                # If the wanted value is lower than the current node value, we move on the left subtree
+                parent  = current
+                current = current.left
+            elif key > current.value:
+                # If the wanted value is greater than the current node value, we move on the right subtree
+                parent  = current
+                current = current.right
+            else:
+                # If the wanted value is equal to the current node value, the node is deleted according to its subtrees
+                if current.left is None:
+                    # If we are at the root, the tree become its right subtree
+                    if parent is None: 
+                        self = self.right
+                    elif parent.left == current:
+                        parent.left = current.right
+                    else:
+                        parent.right = current.right
+                    return self
+                elif current.right is None:
+                    # If we are at the root, the tree become its left subtree
+                    if parent is None: 
+                        self = self.left
+                    elif parent.left == current:
+                        parent.left = current.left
+                    else:
+                        parent.right = current.left
+                    return self
+                else:
+                    # If the current node has two subtrees
+                    # The node is replaced by its successor according the Inorder Traversal (the smallest to the right) 
+                    successor = current.right
+                    while successor.left:
+                        successor = successor.left
+                    current.value = successor.value
+                    current.right = current.right.delete_node(successor.value)
+                    return self
+
+
+    def inorder(self, tab = []):
         """ Print the values of the tree using the Inorder Traversal
 
             Returns:
@@ -129,13 +214,15 @@ class BST(Node):
         if self is None:
             return None
 
-        BST.inorder(self.left)
-        print(self.value, end = " ")
-        BST.inorder(self.right)
+        BST.inorder(self.left, tab)
+        tab.append(self.value)
+        BST.inorder(self.right, tab)
+        if len(tab) == self.size():
+            return tab
         
 
     
-    def preorder(self):
+    def preorder(self, tab = []):
         """ Print the values of the tree using the Preorder Traversal
 
             Returns:
@@ -144,12 +231,15 @@ class BST(Node):
         if self is None:
             return None
         
-        print(self.value, end = " ")
+        tab.append(self.value)
         BST.preorder(self.left)
         BST.preorder(self.right)
 
+        if len(tab) == self.size():
+            return tab
+
     
-    def postorder(self):
+    def postorder(self, tab = []):
         """ Print the values of the tree using the Postorder Traversal
 
             Returns:
@@ -160,10 +250,13 @@ class BST(Node):
 
         BST.postorder(self.left)
         BST.postorder(self.right)
-        print(self.value, end = " ")
+        tab.append(self.value)
+
+        if len(tab) == self.size():
+            return tab
 
     
-    def levelorder(self):
+    def levelorder(self, tab = []):
         """ Print the values of the tree using the Levelorder Traversal/Breadth-first Search
 
             Returns:
@@ -176,7 +269,7 @@ class BST(Node):
 
         while len(queue) > 0:
             current_node = queue.pop(0)
-            print(current_node.value, end = " ")
+            tab.append(current_node.value)
 
             if current_node.left is not None:
                 queue.append(current_node.left)
@@ -184,11 +277,12 @@ class BST(Node):
             if current_node.right is not None:
                 queue.append(current_node.right)
 
+        return tab
 
 
 """ Test Results """
 if __name__ == "__main__":
-    tab  = [ 21, 8, 9, 3, 15, 19, 20, 7, 3, 2, 1, 5, 6, 4, 13, 14, 12, 17, 16, 18]
+    tab  = [ 21, 8, 9, 3, 15, 19, 20, 7, 2, 1, 5, 6, 4, 13, 14, 12, 17, 16, 18]
     tree = BST.create_bst(tab)
 
     #Basic methods
@@ -198,7 +292,10 @@ if __name__ == "__main__":
     print("Search 5: ", BST.search(tree, 5))
 
     #Traversal methods
-    print("\nInorder Traversal: "), tree.inorder()
-    print("\nPreorder Traversal: "), tree.preorder()
-    print("\nPostorder Traversal: "), tree.postorder()
-    print("\nLevelorder Traversal: "), tree.levelorder()
+    print("Inorder Traversal: ", tree.inorder())
+    print("Preorder Traversal: ", tree.preorder())
+    print("Postorder Traversal: ", tree.postorder())
+    print("Levelorder Traversal: ", tree.levelorder())
+
+    #Deletion method
+    print(tree.delete_node(21))
