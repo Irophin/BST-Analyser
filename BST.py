@@ -44,6 +44,57 @@ class BST(Node):
             tree.plant(tab[i])
 
         return tree
+    
+    
+    @staticmethod
+    def smart_create_bst(tab):
+        """ Create a balanced binary search tree from a list of values
+                
+            Parameters:
+                tab(list<any>) : the list of values
+
+            Returns:
+                BST  : the tree
+                None : if the list is empty
+        """
+        if not tab:
+            return None
+        
+        copy_tab = tab.copy()
+        copy_tab.sort()
+
+        recurise_median = []
+        BST.recursive_median(copy_tab, recurise_median, 0, len(copy_tab)-1)
+
+        tree = BST(recurise_median[0])
+        for i in range(1, len(recurise_median)):
+            tree.plant(recurise_median[i])
+
+        return tree
+    
+
+    @staticmethod
+    def recursive_median(values, new_values, i, j):
+        """ Procedure to complete the array new_values with the successive medians of the array values
+            
+            Parameters:
+                values(list<any>) : the list of values
+                new_values(list<any>) : the list of medians
+                i(int) : the index of the first element of the array values
+                j(int) : the index of the last element of the array values
+            
+            returns:
+                None : In any cases
+        """
+
+        if (i > j):
+            return None
+        
+        mediane = (i+j)//2
+        new_values.append(values[mediane])
+
+        BST.recursive_median(values, new_values, i, mediane-1)
+        BST.recursive_median(values, new_values, mediane+1, j)
 
 
     def plant(self, value) :
@@ -111,7 +162,7 @@ class BST(Node):
 
         if (self.value == value):
             return self
-		
+  
         if (self.value < value):
             return BST.search(self.right,value)
         else:
@@ -208,6 +259,9 @@ class BST(Node):
     def inorder(self, tab = []):
         """ Print the values of the tree using the Inorder Traversal
 
+            Parameters:
+                tab(list<any>) : the list of values sorted by the Inorder Traversal
+
             Returns:
                 None : In any cases, especially when the tree has no value
         """
@@ -224,6 +278,9 @@ class BST(Node):
     
     def preorder(self, tab = []):
         """ Print the values of the tree using the Preorder Traversal
+
+            Parameters:
+                tab(list<any>) : the list of values sorted by the Preorder Traversal
 
             Returns:
                 None : In any cases, especially when the tree has no value
@@ -242,6 +299,9 @@ class BST(Node):
     def postorder(self, tab = []):
         """ Print the values of the tree using the Postorder Traversal
 
+            Parameters:
+                tab(list<any>) : the list of values sorted by the Postorder Traversal
+
             Returns:
                 None : In any cases, especially when the tree has no value
         """
@@ -258,6 +318,9 @@ class BST(Node):
     
     def levelorder(self, tab = []):
         """ Print the values of the tree using the Levelorder Traversal/Breadth-first Search
+
+            Parameters:
+                tab(list<any>) : the list of values sorted by the levelorder Traversal
 
             Returns:
                 None : In any cases, especially when the tree has no value
@@ -282,20 +345,22 @@ class BST(Node):
 
 """ Test Results """
 if __name__ == "__main__":
-    tab  = [ 21, 8, 9, 3, 15, 19, 20, 7, 2, 1, 5, 6, 4, 13, 14, 12, 17, 16, 18]
-    tree = BST.create_bst(tab)
+    tab  = [ 21, 8, 9, 3, 15, 19, 20, 7, 3, 2, 1, 5, 6, 4, 13, 14, 12, 17, 16, 18]
+    tree = BST.smart_create_bst(tab)
 
     #Basic methods
-    print("Tree: ", tree)
-    print("Size: ", BST.size(tree))
-    print("Height: ", BST.height(tree))
-    print("Search 5: ", BST.search(tree, 5))
+    print("Tree     : ", tree)
+    print("Size     : ", BST.size(tree))
+    print("Height   : ", BST.height(tree))
+
+    search = BST.search(tree, 5)
+    print("Search 5 : ", search != None and search.value == 5)
 
     #Traversal methods
-    print("Inorder Traversal: ", tree.inorder())
-    print("Preorder Traversal: ", tree.preorder())
-    print("Postorder Traversal: ", tree.postorder())
-    print("Levelorder Traversal: ", tree.levelorder())
+    print("Inorder Traversal    : ", tree.inorder())
+    print("Preorder Traversal   : ", tree.preorder())
+    print("Postorder Traversal  : ", tree.postorder())
+    print("Levelorder Traversal : ", tree.levelorder())
 
     #Deletion method
     print(tree.delete_node(21))
