@@ -1,4 +1,5 @@
 from binarytree import Node
+import math
 
 class BST(Node):
     """ Binary Search Tree class
@@ -116,6 +117,18 @@ class BST(Node):
         BST.recursive_median(values, new_values, mediane+1, j)
 
 
+    @staticmethod
+    def sort(tab):
+        """ Sort a list of values with the binary search tree method
+
+            Parameters:
+                tab(list<any>) : the list of values
+        """ 
+
+        tree = BST.create_bst(tab)
+        return BST.inorder(tree)
+        
+
     def plant(self, value) :
         """ Insert a new value in the tree
             
@@ -129,7 +142,7 @@ class BST(Node):
         if (self == None):
             return BST(value)
         
-        if value < self.value:
+        if value <= self.value:
             self.left = BST.plant(self.left, value)
         else:
             self.right = BST.plant(self.right, value)
@@ -142,7 +155,7 @@ class BST(Node):
         if self is None:
             return BST(value)
         
-        if value < self.value:
+        if value <= self.value:
             self.left = BST.smart_plant(self.left, value)
         else:
             self.right = BST.smart_plant(self.right, value)
@@ -246,28 +259,29 @@ class BST(Node):
         """ Get the node having the maximum value of the tree
 
             Returns:
-                BST   : the node containing the maximum value
-                False : if the value is not in the tree
+                any : the value of the node containing the maximum value
         """
         if self is None:
-            return None
+            return -math.inf
+        
         elif self.right is None:
-            return self
-        self.right.maximum_node()
+            return self.value
+        
+        return BST.maximum_node(self.right)
         
 
     def minimum_node(self):
         """Get the node having the minimum value of the tree
 
             Returns:
-                BST   : the node containing the minimum value
-                False : if the value is not in the tree
+                any : the value of the node containing the minimum value
         """
         if self is None:
-            return None
+            return math.inf
         elif self.left is None:
-            return self
-        self.left.minimum_node()
+            return self.value
+
+        return BST.minimum_node(self.left)
 
 
     def delete_node(self, key):
@@ -329,78 +343,54 @@ class BST(Node):
                     return self
 
 
-    def inorder(self, tab = []):
+    def inorder(self):
         """ Print the values of the tree using the Inorder Traversal
 
-            Parameters:
-                tab(list<any>) : the list of values sorted by the Inorder Traversal
-
             Returns:
-                None : In any cases, especially when the tree has no value
+                list<any> : the list of values sorted by the Inorder Traversal
         """
-        if self is None:
-            return None
 
-        BST.inorder(self.left, tab)
-        tab.append(self.value)
-        BST.inorder(self.right, tab)
+        if self == None:
+            return []
         
-        if len(tab) == self.size():
-            return tab
+        return BST.inorder(self.left) + [self.value] + BST.inorder(self.right)
         
 
-    def preorder(self, tab = []):
+    def preorder(self):
         """ Print the values of the tree using the Preorder Traversal
 
-            Parameters:
-                tab(list<any>) : the list of values sorted by the Preorder Traversal
-
             Returns:
-                None : In any cases, especially when the tree has no value
+                list<any> : the list of values sorted by the Preorder Traversal
         """
         if self is None:
-            return None
+            return []
         
-        tab.append(self.value)
-        BST.preorder(self.left)
-        BST.preorder(self.right)
-
-        if len(tab) == self.size():
-            return tab
+        return [self.value] + BST.preorder(self.left) + BST.preorder(self.right)
 
     
-    def postorder(self, tab = []):
+    def postorder(self):
         """ Print the values of the tree using the Postorder Traversal
 
-            Parameters:
-                tab(list<any>) : the list of values sorted by the Postorder Traversal
-
             Returns:
-                None : In any cases, especially when the tree has no value
+                list<any> : the list of values sorted by the Postorder Traversal
         """
         if self is None:
-            return None
-
-        BST.postorder(self.left)
-        BST.postorder(self.right)
-        tab.append(self.value)
-
-        if len(tab) == self.size():
-            return tab
+            return []
+        
+        return  BST.preorder(self.left) + BST.preorder(self.right) + [self.value]
 
     
-    def levelorder(self, tab = []):
+    def levelorder(self):
         """ Print the values of the tree using the Levelorder Traversal/Breadth-first Search
 
-            Parameters:
-                tab(list<any>) : the list of values sorted by the levelorder Traversal
-
             Returns:
-                None : In any cases, especially when the tree has no value
+                list<any> : the list of values sorted by the Levelorder Traversal
         """
-        if self is None:
-            return None
 
+        if self is None:
+            return []
+
+        tab = []
         queue = [self]
 
         while len(queue) > 0:
@@ -418,19 +408,29 @@ class BST(Node):
 
 """ Test Results """
 if __name__ == "__main__":
-    tab  = [ 21, 8, 9, 3, 15, 19, 20, 7, 3, 2, 1, 5, 6, 4, 13, 14, 12, 17, 16, 18]
+    tab  = [ 21, 8, 9, 15, 19, 20, 7, 3, 2, 1, 5, 6, 4, 13, 14, 12, 17, 16, 18]
+    print("Initial tab : ", tab)
+    print("Sorted tab  : ", BST.sort(tab))
 
-    # tree = BST.create_bst(tab)
-    # tree = BST.create_balanced_bst(tab)
-    tree = BST.create_smart_bst(tab)
+    # tree = BST.create_bst(tab)          # The naive method
+    # tree = BST.create_balanced_bst(tab) # The median method
+    tree = BST.create_smart_bst(tab)      # The rotation method
+
 
     #Basic methods
     print("Tree     : ", tree)
     print("Size     : ", BST.size(tree))
     print("Height   : ", BST.height(tree))
 
-    search = BST.search(tree, 5)
-    print("Search 5 : ", search != None)
+    tree = BST.smart_plant(tree, 102)
+
+    searchValue = 102
+    search = BST.search(tree, searchValue)
+
+    if search is False:
+        print(f"the value {searchValue} doesn't exist in the tree")
+    else:
+        print(f"Search {searchValue} : ", search.value == searchValue)
 
     #Traversal methods
     print("Inorder Traversal    : ", BST.inorder(tree))
@@ -439,7 +439,9 @@ if __name__ == "__main__":
     print("Levelorder Traversal : ", BST.levelorder(tree))
 
     #Deletion method
-
     tree = BST.delete_node(tree, 21)
 
     print("Tree - delete 21 : ", tree)
+
+    print("minimum node : ", BST.minimum_node(tree))
+    print("maximum node : ", BST.maximum_node(tree))
