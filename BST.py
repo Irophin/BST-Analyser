@@ -39,9 +39,10 @@ class BST(Node):
         if not tab:
             return None
 
-        tree = BST.plant(None, tab[0])
+        tree = BST.smart_plant(None, tab[0])
         for i in range(1, len(tab)):
-            tree.plant(tab[i])
+            tree = tree.smart_plant(tab[i])
+            print(tree)
 
         return tree
     
@@ -111,15 +112,56 @@ class BST(Node):
             return BST(value)
         
         if value < self.value:
-            if self.left is None:
-                self.left = BST(value)
-            else:
-                self.left.plant(value)
+            self.left = BST.plant(self.left, value)
         else:
-            if self.right is None:
-                self.right = BST(value)
+            self.right = BST.plant(self.right, value)
+
+        return self
+
+
+    def smart_plant(self, value):
+
+        if self is None:
+            return BST(value)
+        
+        if value < self.value:
+            self.left = BST.smart_plant(self.left, value)
+        else:
+            self.right = BST.smart_plant(self.right, value)
+
+        balance = BST.height(self.left) - BST.height(self.right)
+
+        # if the tree is unbalanced on the left side
+        if balance > 1:
+            if value < self.left.value:
+                return self.rotate_right()
             else:
-                self.right.plant(value)
+                self.left = BST.rotate_left(self.left)
+                return self.rotate_right()
+
+        # if the tree is unbalanced on the right side
+        if balance < -1:
+            if value > self.right.value:
+                return self.rotate_left()
+            else:
+                self.right = BST.rotate_right(self.right)
+                return self.rotate_left()
+
+        return self
+
+
+    def rotate_right(self):
+        left_child = self.left
+        self.left = left_child.right
+        left_child.right = self
+        return left_child
+
+    def rotate_left(self):
+        right_child = self.right
+        self.right = right_child.left
+        right_child.left = self
+        return right_child
+
 
 
     def size(self):
@@ -144,8 +186,7 @@ class BST(Node):
         return 1 + max(
             BST.height(self.left),
             BST.height(self.right),
-        )
-    
+        )        
 
     def search(self, value):
         """ Search a value in the tree
@@ -346,7 +387,7 @@ class BST(Node):
 """ Test Results """
 if __name__ == "__main__":
     tab  = [ 21, 8, 9, 3, 15, 19, 20, 7, 3, 2, 1, 5, 6, 4, 13, 14, 12, 17, 16, 18]
-    tree = BST.smart_create_bst(tab)
+    tree = BST.create_bst(tab)
 
     #Basic methods
     print("Tree     : ", tree)
@@ -363,4 +404,4 @@ if __name__ == "__main__":
     print("Levelorder Traversal : ", tree.levelorder())
 
     #Deletion method
-    print(tree.delete_node(21))
+    print(tree.delete_node(18))
