@@ -10,7 +10,6 @@ class BST(Node):
     """
 
 
-
     def __init__(self, value, left=None, right=None):
         """ Constructor of the class
             
@@ -22,7 +21,6 @@ class BST(Node):
         self.value = value
         self.left  = left
         self.right = right
-
 
 
     @staticmethod
@@ -39,17 +37,16 @@ class BST(Node):
         if not tab:
             return None
 
-        tree = BST.smart_plant(None, tab[0])
+        tree = BST.plant(None, tab[0])
         for i in range(1, len(tab)):
-            tree = tree.smart_plant(tab[i])
-            print(tree)
+            tree = tree.plant(tab[i])
 
         return tree
     
-    
+
     @staticmethod
-    def smart_create_bst(tab):
-        """ Create a balanced binary search tree from a list of values
+    def create_balanced_bst(tab):
+        """ Create a balanced binary search tree from a list of values with the median method
                 
             Parameters:
                 tab(list<any>) : the list of values
@@ -73,6 +70,27 @@ class BST(Node):
 
         return tree
     
+
+    @staticmethod
+    def create_smart_bst(tab):
+        """ Create a ballanced binary search tree from a list of values with the rotation method
+                
+            Parameters:
+                tab(list<any>) : the list of values
+
+            Returns:
+                BST  : the tree
+                None : if the list is empty
+        """
+        if not tab:
+            return None
+
+        tree = BST.smart_plant(None, tab[0])
+        for i in range(1, len(tab)):
+            tree = tree.smart_plant(tab[i])
+
+        return tree
+
 
     @staticmethod
     def recursive_median(values, new_values, i, j):
@@ -151,17 +169,30 @@ class BST(Node):
 
 
     def rotate_right(self):
+        """ Rotate the tree to the right
+        
+            Returns:
+                BST : the new BST root
+        """
         left_child = self.left
         self.left = left_child.right
         left_child.right = self
+
         return left_child
 
+
     def rotate_left(self):
+        """ Rotate the tree to the left
+            
+            Returns:
+                BST : the new BST root
+        """
+
         right_child = self.right
         self.right = right_child.left
         right_child.left = self
-        return right_child
 
+        return right_child
 
 
     def size(self):
@@ -187,6 +218,7 @@ class BST(Node):
             BST.height(self.left),
             BST.height(self.right),
         )        
+
 
     def search(self, value):
         """ Search a value in the tree
@@ -312,11 +344,11 @@ class BST(Node):
         BST.inorder(self.left, tab)
         tab.append(self.value)
         BST.inorder(self.right, tab)
+        
         if len(tab) == self.size():
             return tab
         
 
-    
     def preorder(self, tab = []):
         """ Print the values of the tree using the Preorder Traversal
 
@@ -387,7 +419,10 @@ class BST(Node):
 """ Test Results """
 if __name__ == "__main__":
     tab  = [ 21, 8, 9, 3, 15, 19, 20, 7, 3, 2, 1, 5, 6, 4, 13, 14, 12, 17, 16, 18]
-    tree = BST.create_bst(tab)
+
+    # tree = BST.create_bst(tab)
+    # tree = BST.create_balanced_bst(tab)
+    tree = BST.create_smart_bst(tab)
 
     #Basic methods
     print("Tree     : ", tree)
@@ -395,13 +430,16 @@ if __name__ == "__main__":
     print("Height   : ", BST.height(tree))
 
     search = BST.search(tree, 5)
-    print("Search 5 : ", search != None and search.value == 5)
+    print("Search 5 : ", search != None)
 
     #Traversal methods
-    print("Inorder Traversal    : ", tree.inorder())
-    print("Preorder Traversal   : ", tree.preorder())
-    print("Postorder Traversal  : ", tree.postorder())
-    print("Levelorder Traversal : ", tree.levelorder())
+    print("Inorder Traversal    : ", BST.inorder(tree))
+    print("Preorder Traversal   : ", BST.preorder(tree))
+    print("Postorder Traversal  : ", BST.postorder(tree))
+    print("Levelorder Traversal : ", BST.levelorder(tree))
 
     #Deletion method
-    print(tree.delete_node(18))
+
+    tree = BST.delete_node(tree, 21)
+
+    print("Tree - delete 21 : ", tree)
